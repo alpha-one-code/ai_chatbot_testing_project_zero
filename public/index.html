@@ -32,7 +32,39 @@
         chat.innerHTML += `<p><b>AI:</b> ${data.reply}</p>`;
         chat.scrollTop = chat.scrollHeight;
       }
+
+
     });
+
+inputBox.addEventListener("keydown", async (e) => {
+  if (e.key === "Enter") {
+    const userMsg = inputBox.value.trim();
+    if (!userMsg) return;
+
+    chat.innerHTML += `<p><b>You:</b> ${userMsg}</p>`;
+    inputBox.value = "";
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMsg }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        chat.innerHTML += `<p><b>Error:</b> ${text}</p>`;
+        return;
+      }
+
+      const data = await response.json();
+      chat.innerHTML += `<p><b>AI:</b> ${data.reply}</p>`;
+      chat.scrollTop = chat.scrollHeight;
+    } catch (error) {
+      chat.innerHTML += `<p><b>Error:</b> ${error.message}</p>`;
+    }
+  }
+});
   </script>
 </body>
 </html>
